@@ -9,8 +9,8 @@ func TestCreateNewList(t *testing.T) {
 	if testList.name != testName {
 		t.Errorf("Name mismatch - expects %s, got %s", testName, testList.name)
 	}
-	if len(testList.items) != 1 {
-		t.Error("Item size mismatch")
+	if testList.items != nil {
+		t.Error("Item initialisation failure")
 	}
 }
 
@@ -20,10 +20,42 @@ func TestAddItems(t *testing.T) {
 
 	testList := createNewList(listName)
 	addItem(&testList, itemName)
-	for _, v := range testList.items {
-		if v == itemName {
+	for i := range testList.items {
+		if testList.items[i] == itemName {
 			return
 		}
 	}
-	t.Error("New item not found in list")
+	t.Errorf("New item '%s' not found in list", itemName)
+}
+
+func TestRemoveItems(t *testing.T) {
+	itemName := "Test Item 101"
+	itemTwo := "Test item 202"
+	listName := "testList"
+	testList := createNewList(listName)
+	addItem(&testList, itemName)
+	addItem(&testList, itemTwo)
+
+	removeItem(&testList, itemName)
+
+	for i := range testList.items {
+		if testList.items[i] == itemName {
+			t.Errorf("Item '%s' should have been removed", itemName)
+		}
+	}
+
+}
+
+func ExampleShowList() {
+	itemName := "Test Item 101"
+	itemTwo := "Test item 202"
+	listName := "testList"
+	testList := createNewList(listName)
+	addItem(&testList, itemName)
+	addItem(&testList, itemTwo)
+
+	showList(testList)
+	// Output: List: testList
+	// 1: Test Item 101
+	// 2: Test item 202
 }
