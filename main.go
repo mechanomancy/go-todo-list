@@ -1,6 +1,10 @@
 package main
 
-import "fmt"
+import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+)
 
 /* ToDo list app */
 
@@ -11,14 +15,15 @@ import "fmt"
 // removeItem(list todoList, item string)
 // showList(listName todoList)
 // saveList(listName todoList, fileName string)
+// loadList(fileName string)
 
 func main() {
 
 }
 
 type todoList struct {
-	name  string
-	items []string
+	name  string   `json:"name"`
+	items []string `json:"items"`
 }
 
 func createNewList(listName string) todoList {
@@ -49,4 +54,17 @@ func showList(list todoList) {
 	for i := range list.items {
 		fmt.Printf("%d: %s\n", i+1, list.items[i])
 	}
+}
+
+func loadList(fileName string) (todoList, error) {
+	list := todoList{}
+	file, err := ioutil.ReadFile(fileName)
+	if err != nil {
+		fmt.Println("Error opening file")
+	}
+	err = json.Unmarshal(file, &list)
+	if err != nil {
+		fmt.Println("Error reading json: ", err)
+	}
+	return list, nil
 }

@@ -1,6 +1,8 @@
 package main
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestCreateNewList(t *testing.T) {
 	testName := "testList"
@@ -44,6 +46,17 @@ func TestRemoveItems(t *testing.T) {
 		}
 	}
 
+}
+
+func TestLoadList(t *testing.T) {
+	fileName := "test_data.json"
+	list, err := loadList(fileName)
+	if err != nil {
+		t.Error("Unable to load list")
+	}
+	if list.name != "testList" {
+		t.Errorf("List name mismatch - expected %s, got %s", "testList", list.name)
+	}
 }
 
 func ExampleShowList() {
