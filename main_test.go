@@ -8,10 +8,10 @@ func TestCreateNewList(t *testing.T) {
 	testName := "testList"
 	testList := createNewList(testName)
 
-	if testList.name != testName {
-		t.Errorf("Name mismatch - expects %s, got %s", testName, testList.name)
+	if testList.Name != testName {
+		t.Errorf("Name mismatch - expects %s, got %s", testName, testList.Name)
 	}
-	if testList.items != nil {
+	if testList.Items != nil {
 		t.Error("Item initialisation failure")
 	}
 }
@@ -22,8 +22,8 @@ func TestAddItems(t *testing.T) {
 
 	testList := createNewList(listName)
 	addItem(&testList, itemName)
-	for i := range testList.items {
-		if testList.items[i] == itemName {
+	for i := range testList.Items {
+		if testList.Items[i] == itemName {
 			return
 		}
 	}
@@ -40,8 +40,8 @@ func TestRemoveItems(t *testing.T) {
 
 	removeItem(&testList, itemName)
 
-	for i := range testList.items {
-		if testList.items[i] == itemName {
+	for i := range testList.Items {
+		if testList.Items[i] == itemName {
 			t.Errorf("Item '%s' should have been removed", itemName)
 		}
 	}
@@ -54,18 +54,14 @@ func TestLoadList(t *testing.T) {
 	if err != nil {
 		t.Error("Unable to load list")
 	}
-	if list.name != "testList" {
-		t.Errorf("List name mismatch - expected %s, got %s", "testList", list.name)
+	if list.Name != "testList" {
+		t.Errorf("List name mismatch - expected %s, got %s", "testList", list.Name)
 	}
 }
 
 func ExampleShowList() {
-	itemName := "Test Item 101"
-	itemTwo := "Test item 202"
-	listName := "testList"
-	testList := createNewList(listName)
-	addItem(&testList, itemName)
-	addItem(&testList, itemTwo)
+	fileName := "test_data.json"
+	testList, _ := loadList(fileName)
 
 	showList(testList)
 	// Output: List: testList

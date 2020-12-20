@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"os"
 )
 
 /* ToDo list app */
@@ -22,8 +23,8 @@ func main() {
 }
 
 type todoList struct {
-	name  string   `json:"name"`
-	items []string `json:"items"`
+	Name  string   `json:"name"`
+	Items []string `json:"items"`
 }
 
 func createNewList(listName string) todoList {
@@ -33,38 +34,42 @@ func createNewList(listName string) todoList {
 }
 
 func addItem(list *todoList, item string) {
-	list.items = append(list.items, item)
+	list.Items = append(list.Items, item)
 }
 
 func removeItem(list *todoList, item string) {
-	for i := range list.items {
-		if list.items[i] == item {
+	for i := range list.Items {
+		if list.Items[i] == item {
 			// There's probably a better way to do this but this moves all items left
 			// and then resizes the list
-			copy(list.items[i:], list.items[i+1:])
-			list.items[len(list.items)-1] = ""
-			list.items = list.items[:len(list.items)-1]
+			copy(list.Items[i:], list.Items[i+1:])
+			list.Items[len(list.Items)-1] = ""
+			list.Items = list.Items[:len(list.Items)-1]
 			return
 		}
 	}
 }
 
 func showList(list todoList) {
-	fmt.Printf("List: %s\n", list.name)
-	for i := range list.items {
-		fmt.Printf("%d: %s\n", i+1, list.items[i])
+	fmt.Printf("List: %s\n", list.Name)
+	for i := range list.Items {
+		fmt.Printf("%d: %s\n", i+1, list.Items[i])
 	}
 }
 
 func loadList(fileName string) (todoList, error) {
 	list := todoList{}
-	file, err := ioutil.ReadFile(fileName)
+	file, err := os.Open(fileName)
 	if err != nil {
 		fmt.Println("Error opening file")
+		return list, err
 	}
-	err = json.Unmarshal(file, &list)
+	defer file.Close()
+	fileByte, err := ioutil.ReadAll(file)
+	json.Unmarshal(fileByte, &list)
 	if err != nil {
 		fmt.Println("Error reading json: ", err)
+		return list, err
 	}
 	return list, nil
 }
