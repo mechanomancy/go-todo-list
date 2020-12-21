@@ -59,6 +59,22 @@ func TestLoadList(t *testing.T) {
 	}
 }
 
+func TestLoadMalformedList(t *testing.T) {
+	fileName := "bad_test_data.json"
+	_, err := loadList(fileName)
+	if err == nil {
+		t.Error("Loaded list successfully, should have failed")
+	}
+}
+
+func TestLoadBadFileName(t *testing.T) {
+	fileName := "missing_test_data.json"
+	_, err := loadList(fileName)
+	if err == nil {
+		t.Error("Loaded list successfully, should have failed")
+	}
+}
+
 func ExampleShowList() {
 	fileName := "test_data.json"
 	testList, _ := loadList(fileName)

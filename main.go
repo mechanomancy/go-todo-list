@@ -66,7 +66,7 @@ func loadList(fileName string) (todoList, error) {
 	}
 	defer file.Close()
 	fileByte, err := ioutil.ReadAll(file)
-	json.Unmarshal(fileByte, &list)
+	err = json.Unmarshal(fileByte, &list)
 	if err != nil {
 		fmt.Println("Error reading json: ", err)
 		return list, err
