@@ -27,15 +27,18 @@ type todoList struct {
 	Items []string `json:"items"`
 }
 
+// createNewList takes a name and returns a new empty list with the name field populated
 func createNewList(listName string) todoList {
 	var newItems []string
 	return todoList{listName, newItems}
 }
 
+// addItem adds a new item to the bottom of the list
 func addItem(list *todoList, item string) {
 	list.Items = append(list.Items, item)
 }
 
+/// removeItem takes a list and an item to be removed, then loops over the list until the item is found
 func removeItem(list *todoList, item string) {
 	for i := range list.Items {
 		if list.Items[i] == item {
@@ -49,6 +52,7 @@ func removeItem(list *todoList, item string) {
 	}
 }
 
+// showList takes a list and prints it's name then its contents
 func showList(list todoList) {
 	fmt.Printf("List: %s\n", list.Name)
 	for i := range list.Items {
@@ -56,6 +60,8 @@ func showList(list todoList) {
 	}
 }
 
+// loadList takes a filename and attempts to load a list from this file.
+// On success it returns a new list and nil, on failure it returns an empty list and error
 func loadList(fileName string) (todoList, error) {
 	list := todoList{}
 	file, err := os.Open(fileName)
@@ -73,6 +79,7 @@ func loadList(fileName string) (todoList, error) {
 	return list, nil
 }
 
+// saveList takes a filename and list, save the list to the file, return nil on success or error on failure
 func saveList(fileName string, list *todoList) error {
 	jsonList, err := json.Marshal(&list)
 	if err != nil {
