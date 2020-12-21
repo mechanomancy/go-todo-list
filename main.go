@@ -37,6 +37,8 @@ func main() {
 		addItem(&userList, *add)
 	case *remove != "":
 		removeItem(&userList, *remove)
+	default:
+		showList(userList)
 	}
 	saveList(listFileName, &userList)
 }
@@ -82,14 +84,14 @@ func loadList(fileName string) (todoList, error) {
 	list := todoList{}
 	file, err := os.Open(fileName)
 	if err != nil {
-		fmt.Println("Error opening file")
+		fmt.Println("Unable to open file: ", fileName)
 		return list, err
 	}
 	defer file.Close()
 	fileByte, err := ioutil.ReadAll(file)
 	err = json.Unmarshal(fileByte, &list)
 	if err != nil {
-		fmt.Println("Error reading json: ", err)
+		fmt.Println("Unable to read json: ", err)
 		return list, err
 	}
 	return list, nil
@@ -99,7 +101,7 @@ func loadList(fileName string) (todoList, error) {
 func saveList(fileName string, list *todoList) error {
 	jsonList, err := json.Marshal(&list)
 	if err != nil {
-		fmt.Println("Error creating JSON: ", err)
+		fmt.Println("Error creating json: ", err)
 		return err
 	}
 	f, err := os.OpenFile(fileName, os.O_CREATE, 0644)
