@@ -72,3 +72,25 @@ func loadList(fileName string) (todoList, error) {
 	}
 	return list, nil
 }
+
+func saveList(fileName string, list *todoList) error {
+	jsonList, err := json.Marshal(&list)
+	if err != nil {
+		fmt.Println("Error creating JSON: ", err)
+		return err
+	}
+	f, err := os.OpenFile(fileName, os.O_CREATE, 0644)
+	if err != nil {
+		fmt.Printf("Error creating or opening %s: %s", fileName, err)
+		f.Close()
+		return err
+	}
+	_, err = f.Write(jsonList)
+	if err != nil {
+		fmt.Print("Error writing to file: ", err)
+		f.Close()
+		return err
+	}
+	f.Close()
+	return nil
+}

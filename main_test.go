@@ -75,6 +75,22 @@ func TestLoadBadFileName(t *testing.T) {
 	}
 }
 
+func TestSaveList(t *testing.T) {
+	fileName := "saved_test_data.json"
+	itemName := "Saved Test Item 101"
+	itemTwo := "Saved Test item 202"
+	listName := "testList"
+	testList := createNewList(listName)
+	addItem(&testList, itemName)
+	addItem(&testList, itemTwo)
+
+	err := saveList(fileName, &testList)
+
+	if err != nil {
+		t.Error("Unable to save list")
+	}
+}
+
 func ExampleShowList() {
 	fileName := "test_data.json"
 	testList, _ := loadList(fileName)
