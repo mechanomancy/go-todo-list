@@ -38,7 +38,10 @@ func TestRemoveItems(t *testing.T) {
 	addItem(&testList, itemName)
 	addItem(&testList, itemTwo)
 
-	removeItem(&testList, itemName)
+	err := removeItem(&testList, itemName)
+	if err != nil {
+		t.Error(err)
+	}
 
 	for i := range testList.Items {
 		if testList.Items[i] == itemName {
@@ -46,6 +49,10 @@ func TestRemoveItems(t *testing.T) {
 		}
 	}
 
+	err = removeItem(&testList, itemName)
+	if err == nil {
+		t.Errorf("Item %s has already been removed, this should raise error %s", itemName, err)
+	}
 }
 
 func TestLoadList(t *testing.T) {

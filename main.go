@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -39,7 +40,7 @@ func addItem(list *todoList, item string) {
 }
 
 /// removeItem takes a list and an item to be removed, then loops over the list until the item is found
-func removeItem(list *todoList, item string) {
+func removeItem(list *todoList, item string) error {
 	for i := range list.Items {
 		if list.Items[i] == item {
 			// There's probably a better way to do this but this moves all items left
@@ -47,9 +48,10 @@ func removeItem(list *todoList, item string) {
 			copy(list.Items[i:], list.Items[i+1:])
 			list.Items[len(list.Items)-1] = ""
 			list.Items = list.Items[:len(list.Items)-1]
-			return
+			return nil
 		}
 	}
+	return errors.New("Item not found in list")
 }
 
 // showList takes a list and prints it's name then its contents
