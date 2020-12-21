@@ -28,7 +28,6 @@ type todoList struct {
 }
 
 func createNewList(listName string) todoList {
-	//newItems := make([]string, 1)
 	var newItems []string
 	return todoList{listName, newItems}
 }
