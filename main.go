@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -20,7 +21,24 @@ import (
 // loadList(fileName string)
 
 func main() {
+	list := flag.String("name", "MyList", "The name for your list")
+	add := flag.String("add", "", "An item to be added to your list")
+	remove := flag.String("remove", "", "An item to be removed from your list")
+	flag.Parse()
 
+	listFileName := *list + ".json"
+	userList, err := loadList(listFileName)
+	if err != nil {
+		userList = createNewList(*list)
+		fmt.Println("Created new list - ", *list)
+	}
+	switch {
+	case *add != "":
+		addItem(&userList, *add)
+	case *remove != "":
+		removeItem(&userList, *remove)
+	}
+	saveList(listFileName, &userList)
 }
 
 type todoList struct {
