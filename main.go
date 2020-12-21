@@ -43,11 +43,7 @@ func addItem(list *todoList, item string) {
 func removeItem(list *todoList, item string) error {
 	for i := range list.Items {
 		if list.Items[i] == item {
-			// There's probably a better way to do this but this moves all items left
-			// and then resizes the list
-			copy(list.Items[i:], list.Items[i+1:])
-			list.Items[len(list.Items)-1] = ""
-			list.Items = list.Items[:len(list.Items)-1]
+			list.Items = append(list.Items[:i], list.Items[i+1:]...)
 			return nil
 		}
 	}
@@ -94,6 +90,8 @@ func saveList(fileName string, list *todoList) error {
 		f.Close()
 		return err
 	}
+	// overwrite the contents of the file
+	f.Truncate(0)
 	_, err = f.Write(jsonList)
 	if err != nil {
 		fmt.Print("Error writing to file: ", err)
