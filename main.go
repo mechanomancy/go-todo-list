@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"flag"
@@ -21,22 +22,75 @@ import (
 // loadList(fileName string)
 
 func main() {
-	list := flag.String("name", "MyList", "The name for your list")
-	add := flag.String("add", "", "An item to be added to your list")
-	remove := flag.String("remove", "", "An item to be removed from your list")
-	flag.Parse()
+	conf, output, err := parseConfig(os.Args[0], os.Args[1:])
+	if err == flag.ErrHelp {
+		fmt.Println(output)
+		os.Exit(2)
+	} else if err != nil {
+		fmt.Println("got error:", err)
+		fmt.Println("output:\n", output)
+		os.Exit(1)
+	}
+	actOnList(*conf)
+	// list := flag.String("name", "MyList", "The name for your list")
+	// add := flag.String("add", "", "An item to be added to your list")
+	// remove := flag.String("remove", "", "An item to be removed from your list")
+	// flag.Parse()
 
-	listFileName := *list + ".json"
+	// listFileName := *list + ".json"
+	// userList, err := loadList(listFileName)
+	// if err != nil {
+	// 	userList = createNewList(*list)
+	// 	fmt.Println("Created new list - ", *list)
+	// }
+	// switch {
+	// case *add != "":
+	// 	addItem(&userList, *add)
+	// case *remove != "":
+	// 	removeItem(&userList, *remove)
+	// default:
+	// 	showList(userList)
+	// }
+	// saveList(listFileName, &userList)
+}
+
+type config struct {
+	list   string
+	add    string
+	remove string
+	args   []string
+}
+
+func parseConfig(programmeName string, args []string) (*config, string, error) {
+	flags := flag.NewFlagSet(programmeName, flag.ContinueOnError)
+	var buf bytes.Buffer
+	flags.SetOutput(&buf)
+
+	var conf config
+	flags.StringVar(&conf.list, "name", "MyList", "The name for your list")
+	flags.StringVar(&conf.add, "add", "", "An item to be added to your list")
+	flags.StringVar(&conf.remove, "remove", "", "An item to be removed from your list")
+
+	err := flags.Parse(args)
+	if err != nil {
+		return nil, buf.String(), err
+	}
+	conf.args = flags.Args()
+	return &conf, buf.String(), nil
+}
+
+func actOnList(conf config) {
+	listFileName := conf.list + ".json"
 	userList, err := loadList(listFileName)
 	if err != nil {
-		userList = createNewList(*list)
-		fmt.Println("Created new list - ", *list)
+		userList = createNewList(conf.list)
+		fmt.Println("Created new list - ", conf.list)
 	}
 	switch {
-	case *add != "":
-		addItem(&userList, *add)
-	case *remove != "":
-		removeItem(&userList, *remove)
+	case conf.add != "":
+		addItem(&userList, conf.add)
+	case conf.remove != "":
+		removeItem(&userList, conf.remove)
 	default:
 		showList(userList)
 	}
