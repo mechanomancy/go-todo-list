@@ -34,26 +34,6 @@ func main() {
 		os.Exit(1)
 	}
 	actOnList(*conf)
-	// list := flag.String("name", "MyList", "The name for your list")
-	// add := flag.String("add", "", "An item to be added to your list")
-	// remove := flag.String("remove", "", "An item to be removed from your list")
-	// flag.Parse()
-
-	// listFileName := *list + ".json"
-	// userList, err := loadList(listFileName)
-	// if err != nil {
-	// 	userList = createNewList(*list)
-	// 	log.Println("Created new list - ", *list)
-	// }
-	// switch {
-	// case *add != "":
-	// 	addItem(&userList, *add)
-	// case *remove != "":
-	// 	removeItem(&userList, *remove)
-	// default:
-	// 	showList(userList)
-	// }
-	// saveList(listFileName, &userList)
 }
 
 type config struct {
@@ -63,6 +43,7 @@ type config struct {
 	args   []string
 }
 
+// parseConfig takes command line arguments, parses them and returns a config object with desired actions
 func parseConfig(programmeName string, args []string) (*config, string, error) {
 	flags := flag.NewFlagSet(programmeName, flag.ContinueOnError)
 	var buf bytes.Buffer
@@ -81,6 +62,7 @@ func parseConfig(programmeName string, args []string) (*config, string, error) {
 	return &conf, buf.String(), nil
 }
 
+// actOnList provides core functionality of to-do list app
 func actOnList(conf config) {
 	listFileName := conf.list + ".json"
 	userList, err := loadList(listFileName)
