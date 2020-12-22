@@ -6,7 +6,9 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"io"
 	"io/ioutil"
+	"log"
 	"os"
 )
 
@@ -27,8 +29,8 @@ func main() {
 		fmt.Println(output)
 		os.Exit(2)
 	} else if err != nil {
-		fmt.Println("got error:", err)
-		fmt.Println("output:\n", output)
+		log.Println("got error:", err)
+		log.Println("output:\n", output)
 		os.Exit(1)
 	}
 	actOnList(*conf)
@@ -41,7 +43,7 @@ func main() {
 	// userList, err := loadList(listFileName)
 	// if err != nil {
 	// 	userList = createNewList(*list)
-	// 	fmt.Println("Created new list - ", *list)
+	// 	log.Println("Created new list - ", *list)
 	// }
 	// switch {
 	// case *add != "":
@@ -92,7 +94,7 @@ func actOnList(conf config) {
 	case conf.remove != "":
 		removeItem(&userList, conf.remove)
 	default:
-		showList(userList)
+		showList(userList, os.Stdout)
 	}
 	saveList(listFileName, &userList)
 }
@@ -125,10 +127,10 @@ func removeItem(list *todoList, item string) error {
 }
 
 // showList takes a list and prints it's name then its contents
-func showList(list todoList) {
-	fmt.Printf("List: %s\n", list.Name)
+func showList(list todoList, dst io.Writer) {
+	fmt.Fprintf(dst, "List: %s\n", list.Name)
 	for i := range list.Items {
-		fmt.Printf("%d: %s\n", i+1, list.Items[i])
+		fmt.Fprintf(dst, "%d: %s\n", i+1, list.Items[i])
 	}
 }
 
@@ -138,14 +140,14 @@ func loadList(fileName string) (todoList, error) {
 	list := todoList{}
 	file, err := os.Open(fileName)
 	if err != nil {
-		fmt.Println("Unable to open file: ", fileName)
+		log.Println("Unable to open file: ", fileName)
 		return list, err
 	}
 	defer file.Close()
 	fileByte, err := ioutil.ReadAll(file)
 	err = json.Unmarshal(fileByte, &list)
 	if err != nil {
-		fmt.Println("Unable to read json: ", err)
+		log.Println("Unable to read json: ", err)
 		return list, err
 	}
 	return list, nil
@@ -155,12 +157,12 @@ func loadList(fileName string) (todoList, error) {
 func saveList(fileName string, list *todoList) error {
 	jsonList, err := json.Marshal(&list)
 	if err != nil {
-		fmt.Println("Error creating json: ", err)
+		log.Println("Error creating json: ", err)
 		return err
 	}
 	f, err := os.OpenFile(fileName, os.O_CREATE, 0644)
 	if err != nil {
-		fmt.Printf("Error creating or opening %s: %s", fileName, err)
+		log.Printf("Error creating or opening %s: %s", fileName, err)
 		f.Close()
 		return err
 	}
@@ -168,7 +170,7 @@ func saveList(fileName string, list *todoList) error {
 	f.Truncate(0)
 	_, err = f.Write(jsonList)
 	if err != nil {
-		fmt.Print("Error writing to file: ", err)
+		log.Print("Error writing to file: ", err)
 		f.Close()
 		return err
 	}

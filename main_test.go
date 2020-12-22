@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"os"
 	"reflect"
 	"strings"
@@ -157,38 +158,50 @@ func TestActOnList(t *testing.T) {
 	var test = []struct {
 		conf    config
 		results string
+		output  string
 	}{
 		// Test no args
 		{config{list: "MyList", add: "", remove: "", args: []string{}},
-			"MyList.json"},
+			"MyList.json", "List: MyList\n"},
 		// Test list name
 		{config{list: "Really Cool List", add: "", remove: "", args: []string{}},
-			"Really Cool List.json"},
+			"Really Cool List.json", "List: Really Cool List\n"},
 		// Test add
-		{config{list: "MyList", add: "NewItem1", remove: "", args: []string{}},
-			"MyList.json"},
+		{config{list: "Really Cool List", add: "NewItem1", remove: "", args: []string{}},
+			"Really Cool List.json",
+			"List: Really Cool List\n1: NewItem1\n"},
 		// Test remove
-		{config{list: "MyList", add: "", remove: "NewItem1", args: []string{}},
-			"MyList.json"},
+		{config{list: "Really Cool List", add: "", remove: "NewItem1", args: []string{}},
+			"Really Cool List.json", "List: Really Cool List\n"},
 		// Test everything
-		{config{list: "Really Cool List", add: "NewItem1", remove: "NewItem2", args: []string{}},
-			"Really Cool List.json"},
+		{config{list: "Really Cool List", add: "NewItem2", remove: "NewItem1", args: []string{}},
+			"Really Cool List.json", "List: Really Cool List\n1: NewItem2\n"},
 	}
 	for _, v := range test {
 		t.Run(v.results, func(t *testing.T) {
 			actOnList(v.conf)
 			if _, err := os.Stat(v.results); os.IsNotExist(err) {
-				t.Errorf("Expected file %s, got %s", v.results, err)
+				t.Errorf("Expected:\n%s\nGot:\n%s", v.results, err)
+			}
+			// Grab outputs for testing
+			var buf bytes.Buffer
+			list, _ := loadList(v.results)
+			showList(list, &buf)
+			output := buf.String()
+			if output != v.output {
+				t.Errorf("Expected:\n%s\nGot:\n%s", v.output, output)
 			}
 		})
 	}
+	os.Remove("Really Cool List.json")
+	os.Remove("MyList.json")
 }
 
 func ExampleShowList() {
 	fileName := "test_data.json"
 	testList, _ := loadList(fileName)
 
-	showList(testList)
+	showList(testList, os.Stdout)
 	// Output: List: testList
 	// 1: Test Item 101
 	// 2: Test item 202
